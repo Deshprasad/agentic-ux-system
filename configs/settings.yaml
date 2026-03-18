@@ -1,0 +1,12 @@
+app:
+  name: agentic-ux-system
+  environment: development
+
+services:
+  langserve_port: 8000
+  langflow_port: 7860
+  mcp_port: 9000
+
+vector_db:
+  provider: chromadb
+  path: ./data/vector

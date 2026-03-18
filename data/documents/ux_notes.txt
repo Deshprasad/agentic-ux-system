@@ -1,0 +1,3 @@
+User onboarding should be simple.
+Reduce friction in forms.
+Use clear call to action buttons.

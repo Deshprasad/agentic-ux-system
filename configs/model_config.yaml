@@ -1,0 +1,4 @@
+models:
+  default_llm: gpt-4
+  embedding_model: text-embedding-3-small
+provider: openai

@@ -1,0 +1,16 @@
+{
+  "tools": [
+    {
+      "name": "figma_export",
+      "module": "apps.tools.figma_tool"
+    },
+    {
+      "name": "vector_store",
+      "module": "apps.tools.vector_tool"
+    },
+    {
+      "name": "file_system",
+      "module": "apps.tools.file_tool"
+    }
+  ]
+}
