@@ -1,0 +1,108 @@
+You are a UX Strategist creating a User Persona.
+
+Input:
+
+{input}
+
+Context:
+
+{context}
+
+Create a realistic, decision-making focused persona that can directly inform UX design.
+
+---
+
+1. Persona Name + Title  
+
+Provide a believable name and real-world role.
+
+---
+
+2. Bio Snapshot  
+
+Describe the person as a real human:
+
+- Background and career path  
+
+- Work environment and team context  
+
+- Experience level with tools/technology  
+
+---
+
+3. Responsibilities & Work Context  
+
+- What are they responsible for day-to-day?  
+
+- What kind of tasks do they handle regularly?  
+
+- Who do they collaborate with?  
+
+---
+
+4. Decision-Making Behavior  
+
+- How do they make decisions? (data-driven, instinct, constraints)  
+
+- What influences their choices?  
+
+---
+
+5. Motivations & Goals  
+
+- What are they trying to achieve?  
+
+- What does success look like for them?  
+
+- What gives them a sense of progress or satisfaction?  
+
+---
+
+6. Pain Points & Frustrations  
+
+Use STRICT format:
+
+"It is [difficult/frustrating/confusing] because [specific cause], which affects [specific goal or task]."
+
+Avoid generic statements.
+
+---
+
+7. Fears & Risks  
+
+- What are they afraid might go wrong?  
+
+- What do they actively try to avoid?  
+
+---
+
+8. Touchpoints & Ecosystem  
+
+- Tools, systems, and platforms they use  
+
+- People they interact with  
+
+- Dependencies in their workflow  
+
+---
+
+9. Behavioral Traits (Optional but valuable)  
+
+- Tool confidence (Low / Medium / High)  
+
+- Communication style  
+
+- Working style (process-driven / reactive / structured etc.)
+
+---
+
+Quality Rules:
+
+- Must feel like a real person, not a template  
+
+- Must include context, behavior, and constraints  
+
+- Must be usable for design decisions  
+
+- Avoid generic lines like "wants better UX"
+ 

@@ -1,258 +1,382 @@
 import re
 
-def load_prompt(file_name):
-    with open(f"data/prompts/{file_name}", "r") as f:
-        return f.read()
 
 # =========================================================
-# CONTEXT PARSER
+
+# CORE ENGINE
+
 # =========================================================
+
+def core_engine(user_input):
+
+    context = parse_context(user_input)
+
+    return {
+
+        "context": context,
+
+        "user_input": user_input,
+
+        "experience": context.get("experience", "general"),
+
+        "goal": generate_goal(context),
+
+        "user_problems": generate_user_problems(context),
+
+        "business_problems": generate_business_problems(context)
+
+    }
+
+
+# =========================================================
+
+# CONTEXT PARSER
+
+# =========================================================
+
 def parse_context(user_input):
+
     text = user_input.lower()
 
     if "onboarding" in text:
+
         experience = "onboarding"
+
     elif "checkout" in text:
+
         experience = "checkout"
+
     else:
+
         experience = "general"
 
     return {"experience": experience}
 
 
 # =========================================================
+
 # STRATEGIST
+
 # =========================================================
+
 def strategist(user_input):
+
     text = user_input.lower()
-    if "persona" in text:
-        return ["persona"]
-    if "journey" in text:
-        return ["journey"]
-    if "design brief" in text or "onboarding" in text:
-        return ["design"]
-    return ["design"]
+
+    if any(w in text for w in ["design", "experience", "flow", "brief"]):
+        return "design"
+
+    if any(w in text for w in ["persona", "user type", "target user"]):
+        return "persona"
+
+    if any(w in text for w in ["journey", "experience map"]):
+        return "journey"
+
+    return "design"
 
 
 # =========================================================
-# DOMAIN (INPUT-RESPECTING)
+
+# GOAL
+
 # =========================================================
-def generate_what(context, user_input):
-    return (
-        "A platform based on the given context, focused on addressing key user experience challenges"
-        "and improving the overall flow."
-    )
-    
-# =========================================================
-# GOAL (UX-SPECIFIC)
-# =========================================================
+
 def generate_goal(context):
+
     exp = context["experience"]
 
     if exp == "onboarding":
+
         return (
-            "To improve onboarding completion by reducing friction in identity verification, "
-            "improving system feedback during errors, and enabling users to recover from failures, "
-            "resulting in smoother progression from entry to successful account activation."
+
+            "To improve onboarding completion by reducing friction in verification and enabling recovery from failures, "
+
+            "resulting in smoother user progression and reduced drop-offs."
+
         )
 
     if exp == "checkout":
+
         return (
-            "To improve successful transaction completion by reducing failures during payment processing, "
-            "improving clarity of payment options, and enabling recovery from transaction errors, "
-            "resulting in fewer abandoned transactions."
+
+            "To improve transaction success by reducing payment failures and improving clarity, "
+
+            "resulting in higher completion rates."
+
         )
 
     return (
-        "To improve task completion by reducing interaction friction and improving system feedback, "
-        "resulting in smoother user progression through key flows."
+
+        "To improve task completion by reducing friction and improving clarity, "
+
+        "resulting in smoother user progression."
+
     )
 
-#==========================================================
-# BUILD (NEW - CONTEXT AWARE)
-#==========================================================
+
+# =========================================================
+
+# BUILD
+
+# =========================================================
+
 def generate_build(context):
+
     exp = context["experience"]
+
     if exp == "onboarding":
+
         return (
-            "A seamless onboarding experience that simplifies flows, improves system feedback,"
-            "and enables users to recover from errors, resulting in smoother account activation."
-            )
+
+            "Design a seamless onboarding experience that reduces user effort, improves clarity, "
+
+            "and enables recovery from failures."
+
+        )
+
     if exp == "checkout":
+
         return (
-            "A seamless checkout experience that reduces friction during payment, improve clarity"
-            "of steps, and enables recovery from transaction failures, resulting in higher completion rates."
-            )
-    retutn (
-        "An improved user experience that reduces friction, improves clarity and enables smoother task completion."
-    )
-    
-# =========================================================
-# USER PROBLEMS
-# =========================================================
-def generate_user_problems(context):
-    if context["experience"] == "onboarding":
-        return [
-            {
-                "problem": "It is difficult to complete onboarding because OTP failures and unclear retry handling during verification which affects successful account activation.",
-                "outcome": "By improving OTP handling and retry flows, users are able to complete verification successfully, increasing account activation rates."
-            },
-            {
-                "problem": "There is friction during document upload because file requirements and validation errors are not clearly communicated which affects completion rates.",
-                "outcome": "By providing clear upload guidelines and real-time validation feedback, users are able to complete document submission without errors."
-            },
-            {
-                "problem": "It is frustrating to continue onboarding because session timeouts and lack of progress saving which affects task continuity and increases abandonment.",
-                "outcome": "By enabling session persistence and progress saving, users are able to resume onboarding without restarting, reducing drop-offs."
-            }
-        ]
 
-    return [
-        {
-            "problem": "Users face friction due to unclear interaction flows which affects task completion.",
-            "outcome": "By improving interaction clarity, users can complete tasks more efficiently."
-        }
-    ]
+            "Design a seamless checkout experience that reduces payment failures and improves clarity."
+
+        )
+
+    return "Design an improved experience that reduces friction."
 
 
 # =========================================================
-# BUSINESS PROBLEMS
-# =========================================================
-def generate_business_problems(context):
-    if context["experience"] == "onboarding":
-        return [
-            {
-                "problem": "There is loss of potential users because onboarding friction leads to drop-offs which affects acquisition.",
-                "outcome": "By reducing onboarding friction, more users complete the process, improving acquisition."
-            },
-            {
-                "problem": "There is increased operational effort because failed onboarding requires manual intervention which affects efficiency.",
-                "outcome": "By improving flow success rates, operational overhead is reduced."
-            }
-        ]
 
-    return [
-        {
-            "problem": "Business performance is impacted due to user friction in key flows.",
-            "outcome": "By improving flows, business outcomes improve."
-        }
-    ]
-
+# BACKGROUND 
 
 # =========================================================
-# SCOPE
-# =========================================================
-def generate_scope(context):
-    if context["experience"] == "onboarding":
-        return """Customer – (New users onboarding) – Mobile (iOS/Android 360px-414px)
 
-• Onboarding Experience
-o Initiating onboarding and understanding requirements
-o Entering personal details with validation feedback
-o Uploading documents and handling validation errors
-o Completing OTP verification with retry and fallback options
-o Recovering from errors (timeouts, failed verification)
-o Resuming incomplete onboarding flows
-o Completing onboarding and accessing account
+def generate_background(context):
 
-Customer Support – (Handling onboarding issues) – Desktop (1366px-1920px)
+    exp = context["experience"]
 
-• Support Experience
-o Viewing onboarding status and failure points
-o Assisting users with verification and document issues
-o Resolving incomplete onboarding cases
+    return f"""The organization operates a digital platform supporting {exp} experiences.
+
+Core business:
+
+• Enables users to complete key workflows digitally
+
+Primary challenges:
+
+• Friction in critical steps
+
+• Drop-offs due to failures and unclear recovery
+
+Existing landscape:
+
+• Key components: Application UI, backend services, validation systems
+
+• External dependencies: APIs, third-party services (e.g., OTP/payment systems)
+
+• Data flow: User input → validation → processing → system response
+
+• Control/decision points: Validation checks, retries, error handling
+
+• Storage/state mechanism: Session handling and backend persistence
+
 """
-    return """Customer – (General experience) – Mobile"""
 
 
 # =========================================================
-# ARTIFACT MAPPER (DYNAMIC)
+
+# USER PROBLEMS 
+
 # =========================================================
-def map_artifacts(context, user_problems, business_problems):
-    artifacts = set()
 
-    all_text = " ".join(
-        [p["problem"].lower() for p in user_problems + business_problems]
-    )
-
-    if any(word in all_text for word in ["drop-off", "flow", "navigation", "abandon"]):
-        artifacts.update(["Journey Maps", "User Flows"])
-
-    if any(word in all_text for word in ["otp", "error", "validation", "upload", "failure"]):
-        artifacts.update(["Experience Audit", "Wireframes"])
-
-    if any(word in all_text for word in ["multiple", "steps", "dependency", "process"]):
-        artifacts.update(["Ecosystem Map", "User Flows"])
-
-    if any(word in all_text for word in ["understand", "confusion", "unclear"]):
-        artifacts.update(["Personas", "Journey Maps"])
+def generate_user_problems(context):
 
     if context["experience"] == "onboarding":
-        artifacts.add("Experience Audit")
 
-    if not artifacts:
-        artifacts.update([
-            "Personas",
-            "Journey Maps",
-            "Ecosystem Map",
-            "Experience Audit",
-            "User Flows",
-            "Wireframes"
-        ])
+        return [
 
-    return sorted(list(artifacts))
+            {
+
+                "problem": "It is frustrating because OTP failures occur frequently which affects completing onboarding successfully.",
+
+                "outcomes": [
+
+                    "By improving OTP handling, users complete verification successfully.",
+
+                    "By reducing retries, users experience smoother onboarding."
+
+                ]
+
+            },
+
+            {
+
+                "problem": "It is confusing because retry options are unclear which affects user confidence.",
+
+                "outcomes": [
+
+                    "By improving retry clarity, users proceed without confusion."
+
+                ]
+
+            }
+
+        ]
+
+    return [
+
+        {
+
+            "problem": "It is difficult because flows are unclear which affects task completion.",
+
+            "outcomes": [
+
+                "By improving clarity, users complete tasks efficiently."
+
+            ]
+
+        }
+
+    ]
 
 
 # =========================================================
-# RENDER ARTIFACTS
+
+# BUSINESS PROBLEMS
+
 # =========================================================
-def render_artifacts(artifacts):
-    return "\n".join([f"• {a}" for a in artifacts])
+
+def generate_business_problems(context):
+
+    return [
+
+        {
+
+            "problem": "There is loss of potential users because onboarding friction leads to drop-offs which affects acquisition.",
+
+            "outcomes": [
+
+                "By reducing friction, more users complete onboarding.",
+
+                "By improving completion, acquisition improves."
+
+            ]
+
+        }
+
+    ]
 
 
 # =========================================================
-# FORMAT CONTRACT
+
+# TABLE BUILDER 
+
 # =========================================================
-def render_design_brief(sections):
+
+def build_table(rows, user_type, header):
+
+    table = f"| {header} | Problems | Outcomes |\n"
+
+    table += "|----------|----------|----------|\n"
+
+    for r in rows:
+
+        outcomes = "<br><br>".join(r["outcomes"])
+
+        table += f"| {user_type} | {r['problem']} | {outcomes} |\n"
+
+    return table
+
+
+# =========================================================
+
+# SCOPE
+
+# =========================================================
+
+def generate_scope(context):
+
+    exp = context["experience"]
+
+    return f"""Customer ({exp} experience) – Mobile
+
+Primary workflows:
+
+• Completing key steps
+
+• Validation and submission
+
+Secondary workflows:
+
+• Retry handling
+
+• Error recovery
+
+Supporting activities:
+
+• System feedback
+
+• Support interaction
+
+"""
+
+
+# =========================================================
+
+# DESIGN AGENT
+
+# =========================================================
+
+def design_agent(user_input):
+
+    data = core_engine(user_input)
+
+    context = data["context"]
+
+    user_table = build_table(data["user_problems"], "Customer", "User Type")
+
+    business_table = build_table(data["business_problems"], "Platform", "Business User")
+
     return f"""Design Brief
 
 1. Background
 
 1.1 What is it?
-{sections['what']}
+
+{generate_background(context)}
 
 1.2 What are you trying to build?
-{sections['build']}
+
+{generate_build(context)}
 
 1.3 Who are all the users involved and what is their primary responsibility?
 
 Primary Users:
-• {sections['primary_user']}
+
+• Customer – Completes tasks within the experience
 
 Secondary Users:
-• {sections['secondary_users']}
+
+• Support – Assists users
+
+• Operations – Monitors flows
 
 2. Goal
 
-{sections['goal']}
+{data['goal']}
 
 3. Problems & Outcomes
 
 USERS
 
-| User Type | Problems | Outcomes |
-|----------|----------|----------|
-{sections['user_rows']}
+{user_table}
 
 BUSINESS
 
-| Business User | Problems | Outcomes |
-|--------------|----------|----------|
-{sections['business_rows']}
+{business_table}
 
 4. Scope
 
-{sections['scope']}
+{generate_scope(context)}
 
 5. Stakeholders
 
@@ -264,6 +388,8 @@ Informed: [Member 1 Full Name, Member 2 Full Name]
 
 6. Timelines
 
+6. Timelines
+
 Overall Duration: [Date-Month-Year - Date-Month-Year]
 
 Date Key Milestone
@@ -272,78 +398,92 @@ Date-Month-Year Milestone 2
 
 7. Artifacts
 
-{sections['artifacts']}
+• Personas
+• Journey Maps
+• Ecosystem Map
+• Experience Audit
+• User Flows
+• Wireframes
+
 """
 
 
 # =========================================================
-# DESIGN AGENT
+
+# PERSONA AGENT
+
 # =========================================================
-def design_agent(user_input):
-    prompt_template = load_prompt("design_brief.txt")
-    full_prompt = f"{prompt_template}\n\nUser Input:\n{user_input}"
-    context = parse_context(user_input)
 
-    user_problems = generate_user_problems(context)
-    business_problems = generate_business_problems(context)
+def persona_agent(user_input):
 
-    user_rows = ""
-    for p in user_problems:
-        user_rows += f"| Customer | {p['problem']} | {p['outcome']} |\n"
+    data = core_engine(user_input)
 
-    business_rows = ""
-    for p in business_problems:
-        business_rows += f"| Platform | {p['problem']} | {p['outcome']} |\n"
+    pain_points = ""
 
-    artifacts = map_artifacts(context, user_problems, business_problems)
+    for p in data["user_problems"]:
 
-    sections = {
-        "what": generate_what(context, user_input),
-        "build": generate_build(context),
-        "primary_user": "Customer – Completes onboarding and uses the platform",
-        "secondary_users": "Customer Support – Assists users\n• Operations – Monitors flows\n• Compliance – Ensures requirements",
-        "goal": generate_goal(context),
-        "user_rows": user_rows,
-        "business_rows": business_rows,
-        "scope": generate_scope(context),
-        "artifacts": render_artifacts(artifacts)
-    }
+        pain_points += f"- {p['problem']}\n"
 
-    return render_design_brief(sections)
+    return f"""A user navigating a {data['context']['experience']} experience.
+
+Goal:
+
+{data['goal']}
+
+Challenges:
+
+{pain_points}
+
+"""
 
 
 # =========================================================
-# CRITIC AGENT
-# =========================================================
-def critic_agent(output):
-    feedback = []
 
-    if "OTP" not in output:
-        feedback.append("Missing verification flow depth")
-        
-    if "error" not in output:
-        feedback.append("Missing error handling clarity")
-    if feedback:
-        output += "\n\n(Refined to include better handling f verification and error scenarios.)"
-    return output
+# JOURNEY AGENT
+
+# =========================================================
+
+def journey_agent(user_input):
+
+    return "Journey Mapping Agent is under development."
 
 
 # =========================================================
+
 # ORCHESTRATOR
+
 # =========================================================
+
 def run_agent(user_input):
-    design_output = design_agent(user_input)
-    final_output = critic_agent(design_output)
+
+    task = strategist(user_input)
+
+    if task == "persona":
+
+        result = persona_agent(user_input)
+
+    elif task == "journey":
+
+        result = journey_agent(user_input)
+
+    else:
+
+        result = design_agent(user_input)
 
     print("\n")
-    print("Here’s your thoughtful UX response:\n")
-    print(final_output)
 
-    return final_output
+    print(result)
+
+    return result
 
 
 # =========================================================
+
 # ENTRY
+
 # =========================================================
+
 if __name__ == "__main__":
-    run_agent("Design checkout experience for Amazon where users drop off due to payment failures and lack of trust signals during order placement")
+
+    run_agent("Design onboarding experience for users facing OTP failures and document upload errors")
+ 
